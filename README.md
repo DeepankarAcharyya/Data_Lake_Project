@@ -106,13 +106,14 @@ AWS_SECRET_ACCESS_KEY='<YOUR_AWS_SECRET_KEY>'
 
 
  
-
-     scp -i <.pem-file> <Local-Path> <username>@<EMR-MasterNode-Endpoint>:~<EMR-path>
+```
+     scp -i <.pem-file>  <Local-Path>  <username> @ <EMR-MasterNode-Endpoint> : ~<EMR-path>
+```
 
 * In order to run the script as spark job :
-
+```
     spark-submit etl.py --master yarn --deploy-mode client 
-
+```
 NOTE : Before running job make sure EMR Role have access to s3
 
 <!-- Connect with me -->
