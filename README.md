@@ -90,6 +90,30 @@ The database schema consists of the following tables :
 </div>
 <br><br>
 
+### Deployement
+
+<br>
+
+* First in `dl.cfg` provide the credentials to access the cluster :
+
+
+```
+AWS_ACCESS_KEY_ID='<YOUR_AWS_ACCESS_KEY>'
+AWS_SECRET_ACCESS_KEY='<YOUR_AWS_SECRET_KEY>'
+```
+
+* If using local as the development environemnt, we need to move the scripts from local to EMR 
+
+
+ 
+
+     scp -i <.pem-file> <Local-Path> <username>@<EMR-MasterNode-Endpoint>:~<EMR-path>
+
+* In order to run the script as spark job :
+
+    spark-submit etl.py --master yarn --deploy-mode client 
+
+NOTE : Before running job make sure EMR Role have access to s3
 
 <!-- Connect with me -->
 <div align=center>
