@@ -4,7 +4,7 @@ import os
 from sqlite3 import Date
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf, col, monotonically_increasing_id
-from pyspark.sql.functions import year, month, dayofmonth,dayofweek, hour, weekofyear, date_format
+from pyspark.sql.functions import year, month, dayofmonth,dayofweek, hour, weekofyear
 from pyspark.sql.types import *
 
 config = configparser.ConfigParser()
@@ -41,14 +41,13 @@ def process_song_data(spark, input_data, output_data):
     songs_table = df.select("song_id","title","artist_id","year","duration").drop_duplicates()
     
     # write songs table to parquet files partitioned by year and artist
-    songs_table.write.parquet(output_data+"songs/", mode="overwrite", partitionBy=["year","artist_id"])
+    songs_table.write.parquet(os.path.join(output_data,"songs/"), mode="overwrite", partitionBy=["year","artist_id"])
 
     # extract columns to create artists table
-    artists_table = df.select("artist_id","artist_name","artist_location","artist_lattitude","artist_longitude").drop_duplicates()
+    artists_table = df.select("artist_id","artist_name","artist_location","artist_latitude","artist_longitude").drop_duplicates()
     
     # write artists table to parquet files
-    artists_table.write.parquet(output_data+"songs/", mode="overwrite")
-
+    artists_table.write.parquet(os.path.join(output_data,"artists/"), mode="overwrite")
 
 def process_log_data(spark, input_data, output_data):
     '''
@@ -69,26 +68,22 @@ def process_log_data(spark, input_data, output_data):
     df = df.filter(df.page=="NextSong")
 
     # extract columns for users table    
-    users_table = df.select('userId','first_name','last_name','gender','level').distinct().where(col('userId').isNotNull())
+    users_table = df.select('userId','firstName','lastName','gender','level').distinct().where(col('userId').isNotNull())
     
     # write users table to parquet files
-    users_table.write.parquet(output_data+"users/", mode="overwrite")
+    users_table.write.parquet(os.path.join(output_data,"users/"), mode="overwrite")
 
     # create timestamp column from original timestamp column
     get_timestamp = udf(lambda x : datetime.utcfromtimestamp(int(x)/1000), TimestampType())
     df = df.withColumn("start_time", get_timestamp("ts"))
-    
-    # create datetime column from original timestamp column
-    get_datetime = udf(lambda x : datetime.utcfromtimestamp(int(x)/1000), Date())
-    df = df.withColumn("date_time", get_datetime("ts"))
-    
+        
     # extract columns to create time table
     time_table = df.withColumn("hour",hour("start_time"))\
                     .withColumn("day",dayofmonth("start_time"))\
                     .withColumn("week",weekofyear("start_time"))\
-                    .withColumn("month",month("date_time"))\
-                    .withColumn("year",year("date_time"))\
-                    .withColumn("weekday",dayofweek("date_time"))\
+                    .withColumn("month",month("start_time"))\
+                    .withColumn("year",year("start_time"))\
+                    .withColumn("weekday",dayofweek("start_time"))\
                     .select("ts","start_time","hour", "day", "week", "month", "year", "weekday").drop_duplicates()
     
     # write time table to parquet files partitioned by year and month
