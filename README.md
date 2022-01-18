@@ -47,7 +47,7 @@ The log files in the dataset are partitioned by year and month.
 
 <br>
 
-![log_data](/static_resources/log-data.png)
+![log_data](./static_resources/log-data.png)
 <br><br>
 
 ### Database Schema
@@ -86,7 +86,7 @@ The database schema consists of the following tables :
 <br>
 <div align=center>
 
-![project_workflow](/static_resources/data-flow.png)
+![project_workflow](./static_resources/data-flow.png)
 </div>
 <br><br>
 
@@ -100,6 +100,12 @@ The database schema consists of the following tables :
 ```
 AWS_ACCESS_KEY_ID='<YOUR_AWS_ACCESS_KEY>'
 AWS_SECRET_ACCESS_KEY='<YOUR_AWS_SECRET_KEY>'
+```
+
+* Set the s3 path for the output data in `etl.py`. 
+
+```
+output_data = ""
 ```
 
 * If using local as the development environemnt, we need to move the scripts from local to EMR 
